@@ -187,7 +187,8 @@ fun App() {
                                     modifier = Modifier.size(10.dp)
                                 )
                                 LazyRow(
-                                    modifier = Modifier.fillMaxWidth().padding(start = 100.dp, end = 100.dp, bottom = 10.dp),
+                                    modifier = Modifier.fillMaxWidth()
+                                        .padding(start = 100.dp, end = 100.dp, bottom = 10.dp),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
@@ -222,10 +223,10 @@ fun App() {
                     Column(
                         modifier = Modifier.fillMaxHeight().weight(0.3f).background(Color.White).padding(10.dp)
                     ) {
-                            Spacer(modifier = Modifier.size(10.dp))
+                        Spacer(modifier = Modifier.size(10.dp))
                         LazyColumn {
-                            items(List(10){Random.nextInt(100,300)}){
-                                ReputationCard("dashboard.png",it,"Total Sales")
+                            items(List(10) { Random.nextInt(100, 300) }) {
+                                ReputationCard("dashboard.png", it, "Total Sales")
                             }
                         }
 
@@ -238,29 +239,27 @@ fun App() {
 }
 
 
-
 @Composable
-fun ReputationCard(id:String,width: Int,text:String){
-    Card (modifier = Modifier.fillMaxWidth().padding(10.dp),
-    elevation = 10.dp,
-    shape = RoundedCornerShape(10.dp)
-    ){
-        Column (modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.SpaceAround){
-            Row (modifier = Modifier.fillMaxWidth(),horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically){
-                Card (elevation = 10.dp,
-                shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.size(60.dp)
-                ){
+fun ReputationCard(id: String, width: Int, text: String) {
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(10.dp), elevation = 10.dp, shape = RoundedCornerShape(10.dp)
+    ) {
+        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.SpaceAround) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Card(
+                    elevation = 10.dp, shape = RoundedCornerShape(10.dp), modifier = Modifier.size(60.dp)
+                ) {
                     TopBarIcon(id = id) {}
                 }
                 Text(
-                    text = text,
-                    style = MaterialTheme.typography.h6,
-                    fontFamily = FontFamily.Monospace
+                    text = text, style = MaterialTheme.typography.h6, fontFamily = FontFamily.Monospace
                 )
                 Text(
-                    text = "${(width*100)/300}%",
+                    text = "${(width * 100) / 300}%",
                     style = MaterialTheme.typography.h6,
                     fontFamily = FontFamily.Monospace
                 )
@@ -295,7 +294,6 @@ fun GraphProgress(height: Dp) {
 }
 
 
-
 @Composable
 fun GraphProgressSide(width: Dp) {
 
@@ -313,8 +311,6 @@ fun GraphProgressSide(width: Dp) {
     }
 
 }
-
-
 
 
 @Composable
