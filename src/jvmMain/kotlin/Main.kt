@@ -159,7 +159,7 @@ fun App() {
                                 Row() {
                                     LazyColumn(
                                         modifier = Modifier.weight(0.1f).height(300.dp),
-                                        verticalArrangement = Arrangement.SpaceEvenly,
+                                        verticalArrangement = Arrangement.SpaceBetween,
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
                                         items(8) {
@@ -187,7 +187,7 @@ fun App() {
                                     modifier = Modifier.size(10.dp)
                                 )
                                 LazyRow(
-                                    modifier = Modifier.fillMaxWidth().padding(10.dp),
+                                    modifier = Modifier.fillMaxWidth().padding(start = 100.dp, end = 100.dp, bottom = 10.dp),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
@@ -222,6 +222,12 @@ fun App() {
                     Column(
                         modifier = Modifier.fillMaxHeight().weight(0.3f).background(Color.White).padding(10.dp)
                     ) {
+                            Spacer(modifier = Modifier.size(10.dp))
+                        LazyColumn {
+                            items(List(10){Random.nextInt(100,300)}){
+                                ReputationCard("dashboard.png",it,"Total Sales")
+                            }
+                        }
 
                     }
                 }
@@ -229,6 +235,44 @@ fun App() {
             }
         }
     }
+}
+
+
+
+@Composable
+fun ReputationCard(id:String,width: Int,text:String){
+    Card (modifier = Modifier.fillMaxWidth().padding(10.dp),
+    elevation = 10.dp,
+    shape = RoundedCornerShape(10.dp)
+    ){
+        Column (modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.SpaceAround){
+            Row (modifier = Modifier.fillMaxWidth(),horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically){
+                Card (elevation = 10.dp,
+                shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.size(60.dp)
+                ){
+                    TopBarIcon(id = id) {}
+                }
+                Text(
+                    text = text,
+                    style = MaterialTheme.typography.h6,
+                    fontFamily = FontFamily.Monospace
+                )
+                Text(
+                    text = "${(width*100)/300}%",
+                    style = MaterialTheme.typography.h6,
+                    fontFamily = FontFamily.Monospace
+                )
+
+            }
+            Spacer(modifier = Modifier.size(10.dp))
+            GraphProgressSide(width.dp)
+
+        }
+
+    }
+
 }
 
 
@@ -244,11 +288,33 @@ fun GraphProgress(height: Dp) {
         Box(
             modifier = Modifier.width(30.dp).height(if (height > 300.dp) 300.dp else height).clip(
                 RoundedCornerShape(50.dp)
-            ).background(brush = Brush.verticalGradient(listOf(Color.Magenta, Color.Cyan)), alpha = 0.7f)
+            ).background(brush = Brush.verticalGradient(listOf(Color.Yellow, Color.Green)), alpha = 0.7f)
         )
     }
 
 }
+
+
+
+@Composable
+fun GraphProgressSide(width: Dp) {
+
+    Box {
+        Box(
+            modifier = Modifier.width(300.dp).height(30.dp).shadow(elevation = 10.dp, clip = true).clip(
+                RoundedCornerShape(50.dp)
+            ).background(Color.LightGray)
+        )
+        Box(
+            modifier = Modifier.height(30.dp).width(if (width > 300.dp) 300.dp else width).clip(
+                RoundedCornerShape(50.dp)
+            ).background(brush = Brush.horizontalGradient(listOf(Color.Yellow, Color.Green)), alpha = 0.7f)
+        )
+    }
+
+}
+
+
 
 
 @Composable
