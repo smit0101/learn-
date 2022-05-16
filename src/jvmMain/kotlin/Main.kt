@@ -26,12 +26,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.request.*
+import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 
 @Composable
 @Preview
 fun App() {
+    val client = HttpClient(CIO)
+    val coroutineScope = rememberCoroutineScope()
+    var text by remember { mutableStateOf("") }
     Row(modifier = Modifier.fillMaxSize().background(Color.White)) {
         Card(elevation = 0.dp, shape = RoundedCornerShape(10.dp), modifier = Modifier.padding(5.dp)) {
             Column(modifier = Modifier.fillMaxHeight().width(300.dp), horizontalAlignment = Alignment.Start) {
@@ -64,8 +72,12 @@ fun App() {
                         verticalArrangement = Arrangement.SpaceAround,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-
-
+                        coroutineScope.launch {
+                            val response = client.get("https://api.publicapis.org/entries")
+                            text = response.body()
+                            client.close()
+                        }.start()
+                        Text(text=text)
                     }
 
                 }
@@ -156,7 +168,7 @@ fun App() {
                                     modifier = Modifier.padding(start = 15.dp)
                                 )
                                 Spacer(modifier = Modifier.size(10.dp))
-                                Row() {
+                                Row {
                                     LazyColumn(
                                         modifier = Modifier.weight(0.1f).height(300.dp),
                                         verticalArrangement = Arrangement.SpaceBetween,
@@ -209,7 +221,7 @@ fun App() {
                                         )
                                     ) {
                                         Text(
-                                            text = "$it",
+                                            text = it,
                                             style = MaterialTheme.typography.h6,
                                             fontFamily = FontFamily.Monospace
                                         )
@@ -224,10 +236,25 @@ fun App() {
                         modifier = Modifier.fillMaxHeight().weight(0.3f).background(Color.White).padding(10.dp)
                     ) {
                         Spacer(modifier = Modifier.size(10.dp))
-                        LazyColumn {
-                            items(List(10) { Random.nextInt(100, 300) }) {
-                                ReputationCard("dashboard.png", it, "Total Sales")
+                        var cards = remember {
+                            mutableStateListOf<ReputationCards>()
+                        }
+                        LazyColumn(contentPadding = PaddingValues(start = 10.dp, end = 10.dp)) {
+
+
+
+                            item {
+                                Button(onClick = {
+                                    cards.add(ReputationCards(id = "dashboard.png", Random.nextInt(100,300), "Total Sales"))
+                                }){
+                                    Text("Add")
+                                }
                             }
+
+                            items(cards , key ={it.width}) {
+                                ReputationCard(it.id, it.width, it.text)
+                            }
+
                         }
 
                     }
@@ -244,7 +271,7 @@ fun ReputationCard(id: String, width: Int, text: String) {
     Card(
         modifier = Modifier.fillMaxWidth().padding(10.dp), elevation = 10.dp, shape = RoundedCornerShape(10.dp)
     ) {
-        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.SpaceAround) {
+        Column(Modifier.padding(20.dp), Arrangement.SpaceAround) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
