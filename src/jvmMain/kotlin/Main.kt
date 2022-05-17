@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -29,15 +30,25 @@ import androidx.compose.ui.window.application
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
+import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import kotlin.random.Random
 
 
 @Composable
 @Preview
 fun App() {
-    val client = HttpClient(CIO)
+    val client = HttpClient(CIO){
+        install(ContentNegotiation) {
+            json(Json {
+                prettyPrint = true
+                isLenient = true
+            })
+        }
+    }
     val coroutineScope = rememberCoroutineScope()
     var text by remember { mutableStateOf("") }
     Row(modifier = Modifier.fillMaxSize().background(Color.White)) {
@@ -239,7 +250,10 @@ fun App() {
                         var cards = remember {
                             mutableStateListOf<ReputationCards>()
                         }
-                        LazyColumn(contentPadding = PaddingValues(start = 10.dp, end = 10.dp)) {
+                        val state = rememberLazyListState()
+                        val coroutineScope = rememberCoroutineScope()
+                        LazyColumn(contentPadding = PaddingValues(start = 10.dp, end = 10.dp),
+                        state = state) {
 
 
 
@@ -253,6 +267,16 @@ fun App() {
 
                             items(cards , key ={it.width}) {
                                 ReputationCard(it.id, it.width, it.text)
+
+                            }
+                            item {
+                                Button(onClick={coroutineScope.launch {
+                                    state.animateScrollToItem(
+                                        index = 0
+                                    )
+                                }}){
+                                    Text("Top")
+                                }
                             }
 
                         }
@@ -264,6 +288,7 @@ fun App() {
         }
     }
 }
+
 
 
 @Composable
