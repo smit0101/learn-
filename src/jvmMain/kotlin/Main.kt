@@ -18,6 +18,8 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -34,14 +36,16 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
+import java.net.URL
 import kotlin.random.Random
 
 
 @Composable
 @Preview
 fun App() {
-    val client = HttpClient(CIO){
+    val client = HttpClient(CIO) {
         install(ContentNegotiation) {
             json(Json {
                 prettyPrint = true
@@ -83,15 +87,28 @@ fun App() {
                         verticalArrangement = Arrangement.SpaceAround,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        coroutineScope.launch {
-                            val response = client.get("https://api.publicapis.org/entries")
-                            text = response.body()
-                            client.close()
-                        }.start()
-                        Text(text=text)
-                    }
 
+                        runBlocking {
+                            coroutineScope.launch {
+                                val image: ImageData = client.get("https://api.imgflip.com/get_memes").body()
+                                val response = client.get("https://api.publicapis.org/entries")
+                                text = image.data.memes[0].url
+                            }.start()
+
+                        }
+
+                        Text(text = text)
+                        if (text.isNotEmpty()) {
+                            Image(
+                                bitmap = loadImageBitmap(
+                                    URL(text).openConnection()
+                                        .getInputStream()
+                                ), "", contentScale = ContentScale.FillBounds, modifier = Modifier.fillMaxSize()
+                            )
+                        }
+                    }
                 }
+
 
             }
         }
@@ -252,29 +269,38 @@ fun App() {
                         }
                         val state = rememberLazyListState()
                         val coroutineScope = rememberCoroutineScope()
-                        LazyColumn(contentPadding = PaddingValues(start = 10.dp, end = 10.dp),
-                        state = state) {
-
+                        LazyColumn(
+                            contentPadding = PaddingValues(start = 10.dp, end = 10.dp),
+                            state = state
+                        ) {
 
 
                             item {
                                 Button(onClick = {
-                                    cards.add(ReputationCards(id = "dashboard.png", Random.nextInt(100,300), "Total Sales"))
-                                }){
+                                    cards.add(
+                                        ReputationCards(
+                                            id = "dashboard.png",
+                                            Random.nextInt(100, 300),
+                                            "Total Sales"
+                                        )
+                                    )
+                                }) {
                                     Text("Add")
                                 }
                             }
 
-                            items(cards , key ={it.width}) {
+                            items(cards, key = { it.width }) {
                                 ReputationCard(it.id, it.width, it.text)
 
                             }
                             item {
-                                Button(onClick={coroutineScope.launch {
-                                    state.animateScrollToItem(
-                                        index = 0
-                                    )
-                                }}){
+                                Button(onClick = {
+                                    coroutineScope.launch {
+                                        state.animateScrollToItem(
+                                            index = 0
+                                        )
+                                    }
+                                }) {
                                     Text("Top")
                                 }
                             }
@@ -288,7 +314,6 @@ fun App() {
         }
     }
 }
-
 
 
 @Composable
