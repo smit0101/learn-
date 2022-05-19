@@ -38,6 +38,7 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
+import java.io.File
 import java.net.URL
 import kotlin.random.Random
 
@@ -105,6 +106,8 @@ fun App() {
                                         .getInputStream()
                                 ), "", contentScale = ContentScale.FillBounds, modifier = Modifier.fillMaxSize()
                             )
+                            val s = File("/home/smit/IdeaProjects/learn/src/jvmMain/resources/hey.jpg")
+                            s.createNewFile()
                         }
                     }
                 }
