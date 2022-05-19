@@ -108,6 +108,8 @@ fun App() {
                             )
                             val s = File("/home/smit/IdeaProjects/learn/src/jvmMain/resources/hey.jpg")
                             s.createNewFile()
+                            s.writeBytes( URL(text).openConnection()
+                                .getInputStream().readAllBytes())
                         }
                     }
                 }
